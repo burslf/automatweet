@@ -1,7 +1,7 @@
 import json
 import os
 
-valid_envs = ["develop"]
+valid_envs = ["develop", "staging", "prod"]
 
 
 def get_valid_envs():
