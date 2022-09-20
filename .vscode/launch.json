@@ -8,7 +8,8 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "module": "api.direct_message",
             "console": "integratedTerminal",
             "justMyCode": true
         },

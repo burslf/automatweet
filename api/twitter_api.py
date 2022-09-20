@@ -2,6 +2,7 @@ import os
 import json
 import random
 from requests_oauthlib import OAuth1Session
+from TwitterAPI import TwitterAPI
 
 import azapi
 
@@ -10,8 +11,8 @@ from load_env import load_environment_variables
 
 class TweetAPI:
     api_key = api_secret = access_key = access_secret = None
-    auth = None
-    base_api_url = "https://api.twitter.com/2"
+    api = None
+    # base_api_url = "https://api.twitter.com/2"
 
     def init_auth(
         self,
@@ -30,12 +31,13 @@ class TweetAPI:
         self.access_key = access_key
         self.access_secret = access_secret
 
-        self.auth = OAuth1Session(
-            client_key=self.api_key,
-            client_secret=self.api_secret,
-            resource_owner_key=access_key,
-            resource_owner_secret=access_secret,
+        self.api =  TwitterAPI(
+            access_token_key=os.environ['access_key'],
+            access_token_secret=os.environ['access_secret'],
+            consumer_key=os.environ['api_key'],
+            consumer_secret=os.environ['api_secret'],
         )
+
 
     def create_tweet(
         self,
@@ -106,6 +108,44 @@ class TweetAPI:
         return user_id
 
 
+    def send_dm(
+        self,
+        username,
+    ):
+        user_id = self.get_user_id(
+            username=username
+        )
+        payload = {
+            'event': {
+                'type': 'message_create',
+                'message_create': {
+                    'target': {
+                        'recipient_id': f'{user_id}'
+                    },
+                    'message_data': {
+                        'text': 'Hello World!'
+                    }
+                }
+            }
+        }
+
+        response = self.auth.post(
+            url=f'https://api.twitter.com/1.1/direct_messages/events/new.json',
+            json=payload,
+        )
+
+        print(response)
+        # if response.status_code != 201:
+        #     raise Exception(
+        #         "Request returned an error: {} {}".format(
+        #             response.status_code, response.text)
+        #     )
+
+        # return response.json()
+
+        
+
+
 if __name__ == "__main__":
     load_environment_variables()
 
@@ -116,15 +156,15 @@ if __name__ == "__main__":
 
     tweeapi = TweetAPI()
 
-    tweeapi.init_auth(        
+    tweeapi.init_auth(
         api_secret=api_secret,
         api_key=api_key,
         access_key=access_key,
         access_secret=access_secret
     )
 
-    res = tweeapi.get_mentions(username="0xgrind")
-
+    # res = tweeapi.get_mentions(username="0xgrind")
+    res = tweeapi.send_dm('b_urslf_')
     print(res)
 
     # res = tweeapi.create_tweet(content="my boo is the best boo")
