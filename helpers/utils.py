@@ -1,7 +1,7 @@
-import json
+import random
 
-with open('json_data.json') as json_file:
-    titles = json.load(json_file)
+def remove_empty_lines(lyrics):
+    return list(filter((lambda x: len(x) > 0), lyrics))
 
-for title in titles:
-    print(title)
+def get_random_lyrics_index(lyrics):
+    return random.randrange(len(lyrics)-2)

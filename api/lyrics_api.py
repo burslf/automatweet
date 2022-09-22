@@ -1,7 +1,9 @@
-import json
 import random
 import azapi
 from playwright.sync_api import sync_playwright
+from helpers.s3 import add_json_file_to_s3, get_s3_json_file
+
+from helpers.utils import get_random_lyrics_index, remove_empty_lines
 
 class LyricsAPI:
 
@@ -19,7 +21,7 @@ class LyricsAPI:
         )
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch()
             page = browser.new_page()
 
             artist_page_url = f"https://www.azlyrics.com/{first_letter}/{formatted_artist_name}.html"
@@ -39,34 +41,46 @@ class LyricsAPI:
 
             
             browser.close()
-
+            
             return response
 
 
     def get_random_song(
         self,
+        artist
     ):
-        with open('sinatracks.json') as json_file:
-            titles = json.load(json_file)
+        formatted_artist = self.format_artist_name(artist)
+                
+        titles = get_s3_json_file(bucket_name='songs-lyrics', file_name=f'{formatted_artist}.json')
+        
+        if not titles:
+            titles = self.fetch_titles(
+                artist=artist
+            )   
+            add_json_file_to_s3(bucket_name='songs-lyrics', file_name=formatted_artist, json_data=titles)
 
         random_title = random.choice(titles)
 
         API = azapi.AZlyrics('google', accuracy=0.5)
 
-        API.artist = 'Frank Sinatra'
+        API.artist = artist
         API.title = random_title
 
         lyrics = API.getLyrics()
-        lyrics_list = lyrics.split('\n')\
+        lyrics_list = lyrics.split('\n')
 
-        filtered_lyrics = list(filter((lambda x: len(x) > 0), lyrics_list))
-        return filtered_lyrics
+        filtered_lyrics = remove_empty_lines(lyrics_list)
+
+        return {
+            'title': random_title,
+            'lyrics': filtered_lyrics
+        }
 
     def artist_first_letter(
         self,
         artist
     ):
-        return artist[0]
+        return artist[0].lower()
 
     def format_artist_name(
         self,
@@ -74,8 +88,18 @@ class LyricsAPI:
     ):
         return "".join(artist_name.split(" ")).lower()
 
-if __name__ == "__main__":
+def get_two_random_lyrics(
+    artist
+):
     lyricsapi = LyricsAPI()
+    
+    song = lyricsapi.get_random_song(artist=artist)
+    
+    index = get_random_lyrics_index(song['lyrics'])
 
-    songs = lyricsapi.fetch_titles("lil baby")
-    print(songs)
+    two_lines_lyrics = song['lyrics'][index:index+2]
+    
+    return {
+        'title': song['title'],
+        'lyrics': two_lines_lyrics
+    }

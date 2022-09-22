@@ -1,0 +1,26 @@
+org: burslf
+app: babyquoter
+service: babyquoter
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-1
+  stage: develop
+  environment: ${file(env.json)}
+
+functions:
+  babyquoter:
+    handler: app.main
+    timeout: 30
+    events:
+      - schedule:
+          rate: rate(3 minutes)
+    layers:
+      - ${file(env.json):LAMBDA_HANDLER_LAYER_ARN}
+
+package:
+  patterns:
+    - '!.env/**'
+    - '!node_modules/**'

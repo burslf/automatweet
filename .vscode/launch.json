@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python: Test",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "module": "api.direct_message",
+            "module": "api.twitter_api",
             "console": "integratedTerminal",
             "justMyCode": true
         },
@@ -21,6 +21,16 @@
             "module": "api.twitter_api",
             "console": "integratedTerminal",
             "justMyCode": true
-        }
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        
     ]
 }
