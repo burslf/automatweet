@@ -3,3 +3,5 @@ env.json
 .env
 .vscode/
 songs/
+node_modules
+.serverless

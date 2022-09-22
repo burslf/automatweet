@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/burslf/automatweet/issues"
   },
-  "homepage": "https://github.com/burslf/automatweet#readme"
+  "homepage": "https://github.com/burslf/automatweet#readme",
+  "devDependencies": {
+    "serverless": "^3.22.0"
+  }
 }
