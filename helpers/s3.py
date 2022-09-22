@@ -1,7 +1,7 @@
 import boto3
 import json
 
-boto3.setup_default_session(profile_name='personal')
+# boto3.setup_default_session(profile_name='personal')
 
 def get_s3_json_file(
     bucket_name, 
